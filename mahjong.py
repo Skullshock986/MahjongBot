@@ -1,4 +1,5 @@
 import json
+import random
 from typing import List
 
 total_tiles = {}
@@ -11,19 +12,31 @@ class Player:
         self._hand = hand #Would be ideal to ensure the list is sorted, either we can implement it into the constructor at this stage or we can check it at the input stage idk which is better
     
     def discard(self, drawnTile: str): #Eventually will be filled with a method to select a discard, then return new hand and the discard tile
-        self._hand.append(str) #append 14th tile to hand
+
+        print(self._hand)
+        print()
+
+        self._hand.append(drawnTile) #append 14th tile to hand
         discardPossibilities = []
         for i in range(len(self._hand)): 
 
             tempHand = self._hand[:i] + self._hand[i+1:]
 
             tempScore = self.format_hand(tempHand)
-            discardPossibilities = (self._hand[i] , tempScore)  
+            discardPossibilities.append((self._hand[i] , tempScore))  
         
-        discardPossibilities.sort(key=lambda x: (x[1]["shanten"], x[1]["tileEff"]))
+        discardPossibilities.sort(key=lambda x: (x[1]["shanten"], -x[1]["tileEff"]))
+        
+        print(discardPossibilities)
+        print()
 
+        self._hand.remove(discardPossibilities[0][0])
 
-    def format_hand(self, hand:List[str]) : #The intent is to separate the raw hand into sublists with integer values for each suit and an integer count of the honour tiles
+        
+        print(self._hand)
+        print()
+
+    def format_hand(self, hand) : #The intent is to separate the raw hand into sublists with integer values for each suit and an integer count of the honour tiles
         
 
         handDict = {
@@ -44,6 +57,7 @@ class Player:
                 if item in i:
                     if item in ["char", "circ", "bamb"]:
                         handDict[item].append(int(i[0]))
+                        handDict[item].sort()
                     else:
                         handDict[item] +=1
 
@@ -57,10 +71,10 @@ class Player:
         return handScore
 
     def calcShanten(self, handDict):
-        return 1
+        return random.randint(0,5)
 
     def calcTileEff(self, handDict):
-        return 30
+        return random.randint(1,30)
 
     
 
