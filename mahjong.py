@@ -95,14 +95,14 @@ class Player:
         handScore = {
             "displayHand" : handDict,
             "calcHand" : handArray,
-            "shanten" : self.calcShanten(handDict),
+            "shanten" : self.calcShanten(handArray),
             "tileEff" : self.calcTileEff(handDict)
             
         }
 
         return handScore
 
-    def calcShanten(self, handDict):
+    def calcShanten(self, hand):
          #hand needs to be reformated: i represent tiles of the same array by a array length 9 where the entries are then numer of tiles
         #so [0,1,2,1,0,..] means 2334
         #for honours we will probably have to have an array for them as well and make a restriction that no sequence
