@@ -41,31 +41,63 @@ class Player:
 
         handDict = {
             "char": [],   # Hopefully this will be useful for calculating shanten and similar operations
-            "circ": [],
             "bamb": [],
+            "circ": [],
             "e_wind": 0,
             "s_wind": 0,
             "w_wind": 0,
             "n_wind": 0,
-            "r_drag": 0,
-            "g_drag": 0,
             "w_drag": 0,
+            "g_drag": 0,
+            "r_drag": 0,
         }
+
+        handArray = [[0 for x in range(9)], [0 for x in range(9)], [0 for x in range(9)], [0 for x in range(7)]]
 
         for i in hand:
             for item in handDict:
                 if item in i:
                     if item in ["char", "circ", "bamb"]:
+
+                        suitsDict = {
+                            "char" : 0,
+                            "bamb" : 1,
+                            "circ" : 2,
+                        }
+
+                        honorsDict = {
+                            "e_wind": 0,
+                            "s_wind": 1,
+                            "w_wind": 2,
+                            "n_wind": 3,
+                            "w_drag": 4,
+                            "g_drag": 5,
+                            "r_drag": 6,
+                        }
+                                
                         handDict[item].append((i.split("_")[0]))
                         handDict[item].sort()
+
+                        print(i, (suitsDict[item]), int(i[0]) - 1) 
+
+                        handArray[suitsDict[item]][int(i[0]) - 1] += 1
+
                     else:
                         handDict[item] +=1
+                        
+                        print(i, 3, honorsDict[item])
+                        handArray[3][honorsDict[item]] +=1
 
         
+        print(handArray)
+        print()
+
         handScore = {
-            "hand" : handDict,
+            "displayHand" : handDict,
+            "calcHand" : handArray,
             "shanten" : self.calcShanten(handDict),
             "tileEff" : self.calcTileEff(handDict)
+            
         }
 
         return handScore
