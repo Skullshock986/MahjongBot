@@ -11,12 +11,20 @@ class Game:
         self.tilePool = start_tiles
 
     def chooseDora(self):
-        # Extract keys and weights from the dictionary
         keys, weights = zip(*self.tilePool.items())
+        self.tempRandomElement = random.choices(keys, weights=weights)[0]
+        self.tilePool[self.tempRandomElement] -= 1
+        return(self.tempRandomElement)
 
-        # Choose a random element based on weights
-        random_element = random.choices(keys, weights=weights)[0]
-        return(random_element)    
+    def drawHand(self):
+        self.tempHandArray = []
+        for i in range(13):
+            keys, weights = zip(*self.tilePool.items())
+            self.tempRandomElement = random.choices(keys, weights=weights)[0]
+            self.tilePool[self.tempRandomElement] -= 1
+
+
+            
 
 class Player:
     def __init__(self, hand: list) -> None:
