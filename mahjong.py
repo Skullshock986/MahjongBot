@@ -17,6 +17,10 @@ class Player:
         print()
 
         self._hand.append(drawnTile) #append 14th tile to hand
+
+        print(self._hand)
+        print()
+
         discardPossibilities = []
         for i in range(len(self._hand)): 
 
@@ -78,19 +82,12 @@ class Player:
                         handDict[item].append((i.split("_")[0]))
                         handDict[item].sort()
 
-                        print(i, (suitsDict[item]), int(i[0]) - 1) 
-
                         handArray[suitsDict[item]][int(i[0]) - 1] += 1
 
                     else:
                         handDict[item] +=1
                         
-                        print(i, 3, honorsDict[item])
                         handArray[3][honorsDict[item]] +=1
-
-        
-        print(handArray)
-        print()
 
         handScore = {
             "displayHand" : handDict,
@@ -202,12 +199,12 @@ class Player:
             return current_shanten
         def shanten_honours(hand):
             current_shanten=0
-            for i in range(hand):
+            for i in hand:
                 if i > 2:
                     current_shanten += 2
                 if i == 2:
                     current_shanten += 1
-            return 
+            return current_shanten
         return 8 -(shanten(hand[0]) + shanten(hand[1]) + shanten(hand[2]) + shanten_honours(hand[3]))
     
 
