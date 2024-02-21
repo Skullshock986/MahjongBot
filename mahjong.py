@@ -9,11 +9,15 @@ with open('tiles.json', 'r') as file:
 class Game:
     def __init__(self) -> None:
         self.tilePool = start_tiles
+        self.dora = self.chooseDora()
+        self.seats = ["n", "e", "s", "w"]
+
 
     def chooseDora(self):
         keys, weights = zip(*self.tilePool.items())
         self.tempRandomElement = random.choices(keys, weights=weights)[0]
         self.tilePool[self.tempRandomElement] -= 1
+
         return(self.tempRandomElement)
 
     def drawHand(self):
@@ -22,13 +26,26 @@ class Game:
             keys, weights = zip(*self.tilePool.items())
             self.tempRandomElement = random.choices(keys, weights=weights)[0]
             self.tilePool[self.tempRandomElement] -= 1
+        
+        return self.tempHandArray
+    
+    def getSeat(self):
+        seat = random.choice(self.seats)
+        self.seats.remove(seat)
 
+        return seat
+
+    def main(self):
+        
+        players = [Player(self.drawHand(), self.getSeat()) for i in range(4)]
 
             
 
 class Player:
-    def __init__(self, hand: list) -> None:
+    def __init__(self, hand: list, seat) -> None:
         self._hand = hand #Would be ideal to ensure the list is sorted, either we can implement it into the constructor at this stage or we can check it at the input stage idk which is better
+        self._seat = seat
+        self._dealer = True if seat == "e" else False
     
     def discard(self, drawnTile: str): #Eventually will be filled with a method to select a discard, then return new hand and the discard tile
 
@@ -112,7 +129,7 @@ class Player:
             "displayHand" : handDict,
             "calcHand" : handArray,
             "shanten" : self.calcShanten(handArray),
-            "tileEff" : self.calcTileEff(handDict)
+            "tileEff" : self.calcTileEff(handArray)
             
         }
 
