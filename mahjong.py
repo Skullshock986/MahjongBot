@@ -103,7 +103,113 @@ class Player:
         return handScore
 
     def calcShanten(self, handDict):
-        return random.randint(0,5)
+         #hand needs to be reformated: i represent tiles of the same array by a array length 9 where the entries are then numer of tiles
+        #so [0,1,2,1,0,..] means 2334
+        #for honours we will probably have to have an array for them as well and make a restriction that no sequence
+        
+        def pairs(suit_arr):
+            possible_pairs=[]
+
+            for i in range(9):
+                if suit_arr[i]>1:
+                    out = [0]*9
+                    out[i] = 2
+                    possible_pairs.append(out)
+            return possible_pairs
+
+        def triplets(suit_arr):
+            possible_triplets=[]
+
+            for i in range(9):
+                if suit_arr[i]>2:
+                    out = [0]*9
+                    out[i] = 3
+                    possible_triplets.append(out)
+            return possible_triplets
+
+        def complete_sequences(suit_arr):
+            possible_sequences=[]
+            for i in range(2,9):
+                if suit_arr[i]>0 and suit_arr[i-1]>0 and suit_arr[i-2]>0:
+                    out = [0]*9
+                    out[i]=1
+                    out[i-1]=1
+                    out[i-2]=1
+                    possible_sequences.append(out)
+            return possible_sequences
+
+        def incomplete_sequences(suit_arr):
+            possible_insequences=[]
+            if suit_arr[0]>0 and suit_arr[1]>0:
+                out = [0]*9
+                out[0]=1
+                out[1]=1
+                possible_insequences.append(out)
+            for i in range(2,9):
+                if suit_arr[i]>0 and suit_arr[i-1]>0:
+                    out = [0]*9
+                    out[i]=1
+                    out[i-1]=1
+                    possible_insequences.append(out)
+                if suit_arr[i]>0 and suit_arr[i-2]>0:
+                    out = [0]*9
+                    out[i]=1
+                    out[i-2]=1
+                    possible_insequences.append(out)
+            return possible_insequences
+        
+        def resulting_hand(arr1,arr2):
+            out=[0]*9
+            for i in range(9):
+                out[i] = arr1[i] - arr2[i]
+            return out
+        
+        def shanten_nogroups(hand):
+            set_insequences = incomplete_sequences(hand)
+            current_shan=0
+            set_pairs = pairs(hand)
+
+            for i in set_insequences:
+                current = shanten_nogroups(resulting_hand(hand, i))+1
+                if current > current_shan:
+                    current_shan = current
+
+            for i in set_pairs:
+                current = shanten_nogroups(resulting_hand(hand, i))+1
+
+                if current>current_shan:
+                    current_shan = current
+            return current_shan
+        
+        def shanten(hand):
+            current_shanten=0
+            set_pairs = pairs(hand)
+            set_seq = complete_sequences(hand)
+            set_triplets = triplets(hand)
+
+            if len(set_seq) == 0  and len(set_triplets) == 0:
+                current_shanten += shanten_nogroups(hand)
+
+            for j in set_seq:
+                current = shanten(resulting_hand(hand, j))+2
+                if current>current_shanten:
+                    current_shanten = current
+
+            for j in set_triplets:
+                current = shanten(resulting_hand(hand, j))+2
+                if current>current_shanten:
+                    current_shanten = current
+            return current_shanten
+        def shanten_honours(hand):
+            current_shanten=0
+            for i in range(hand):
+                if i > 2:
+                    current_shanten += 2
+                if i == 2:
+                    current_shanten += 1
+            return 
+        return 8 -(shanten(hand[0]) + shanten(hand[1]) + shanten(hand[2]) + shanten_honours(hand[3]))
+    
 
     def calcTileEff(self, handDict):
         return random.randint(1,30)
