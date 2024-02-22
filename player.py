@@ -193,23 +193,23 @@ class Player:
             return out
         
 
-        def splits_nogroups(handArray):
-            set_insequences = incomplete_sequences(handArray)
+        def splits_nogroups(hand):
+            set_insequences = incomplete_sequences(hand)
             current_shan=0
-            set_pairs = pairs(handArray)
+            set_pairs = pairs(hand)
             pair_bool = False
 
             for i in set_pairs:
-                pair_bool = True
-                current = splits_nogroups(resulting_hand(handArray, i))[0]+1
+                current = splits_nogroups(resulting_hand(hand, i))[0]+1
                 if current>current_shan:
                     current_shan = current
+                    pair_bool = True
 
             for i in set_insequences:
-                current = splits_nogroups(resulting_hand(handArray, i))[0]+1
+                current = splits_nogroups(resulting_hand(hand, i))[0]+1
                 if current > current_shan:
                     current_shan = current
-                    pair_bool = False
+                    pair_bool = splits_nogroups(resulting_hand(hand, i))[1]
 
             return current_shan, pair_bool
 
@@ -250,20 +250,21 @@ class Player:
             return current_g_n,current_i_n,pair_presance
         
 
-        def splits_fullhand(handArray):
+        def splits_fullhand(hand):
             current_split = [0,0,False]
-            for i in handArray[:3]:
+            for i in hand[:3]:
                 current_arr = splits(0, i)
                 current_split[0] += current_arr[0]
                 current_split[1] += current_arr[1]
                 if current_arr[2] == True:
                     current_split[2] = True
 
-            for i in handArray[3]:
+            for i in hand[3]:
                 if i == 3:
                     current_split[0] += 1
                 elif i == 2:
                     current_split[1] +=1
+                    current_split[2] = True
             return current_split
 
 
@@ -274,7 +275,7 @@ class Player:
             pair_presence = split_arr[2]
 
             #checking for the edge case:
-            if g == 3 and pair_presence == False:
+            if g == 3 and i==2 and pair_presence == False:
                 return 1
             return 8 - 2*g - min(i, 4-g) - min(1, max(0,i-4+g))
         
