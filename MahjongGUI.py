@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox, ttk
 
-from Mahjong import Player
+from player import Player
 
 
 class MahjongGUI(tk.Tk):
@@ -66,7 +66,7 @@ class MahjongGUI(tk.Tk):
 # Example usage
 if __name__ == "__main__":
     # Initialize the player
-    player = Player(["2_char", "3_char", "5aka_char", "2_circ", "3_circ", "6_circ", "6_circ", "6_bamb", "7_bamb", "7_bamb", "w_drag", "w_drag", "w_drag"])
+    player = Player(["2_char", "3_char", "5aka_char", "2_circ", "3_circ", "6_circ", "6_circ", "6_bamb", "7_bamb", "7_bamb", "w_drag", "w_drag", "w_drag"], "e")
 
     # Create and run the GUI
     app = MahjongGUI(player)
