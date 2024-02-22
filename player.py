@@ -277,6 +277,8 @@ class Player:
             #checking for the edge case:
             if g == 3 and i==2 and pair_presence == False:
                 return 1
+            if g == 2 and i == 3 and pair_presence == False:
+                return 2
             return 8 - 2*g - min(i, 4-g) - min(1, max(0,i-4+g))
         
 
