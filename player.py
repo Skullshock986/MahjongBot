@@ -105,10 +105,7 @@ class Player:
         return handScore
 
     def calcShanten(self, hand):
-         #hand needs to be reformated: i represent tiles of the same array by a array length 9 where the entries are then numer of tiles
-        #so [0,1,2,1,0,..] means 2334
-        #for honours we will probably have to have an array for them as well and make a restriction that no sequence
-        
+
         def pairs(suit_arr):
             possible_pairs=[]
 
@@ -166,51 +163,72 @@ class Player:
                 out[i] = arr1[i] - arr2[i]
             return out
         
-        def shanten_nogroups(hand):
+        def splits_nogroups(hand):
             set_insequences = incomplete_sequences(hand)
             current_shan=0
             set_pairs = pairs(hand)
 
             for i in set_insequences:
-                current = shanten_nogroups(resulting_hand(hand, i))+1
+                current = splits_nogroups(resulting_hand(hand, i))+1
                 if current > current_shan:
                     current_shan = current
 
             for i in set_pairs:
-                current = shanten_nogroups(resulting_hand(hand, i))+1
-
+                current = splits_nogroups(resulting_hand(hand, i))+1
                 if current>current_shan:
                     current_shan = current
             return current_shan
-        
-        def shanten(hand):
-            current_shanten=0
+
+        def splits(g, hand):          #******
+            current_g_n = g
+            current_i_n = 0                             
             set_pairs = pairs(hand)
             set_seq = complete_sequences(hand)
             set_triplets = triplets(hand)
 
             if len(set_seq) == 0  and len(set_triplets) == 0:
-                current_shanten += shanten_nogroups(hand)
+                return g, splits_nogroups(hand)
+
 
             for j in set_seq:
-                current = shanten(resulting_hand(hand, j))+2
-                if current>current_shanten:
-                    current_shanten = current
+                current = splits(g+1, resulting_hand(hand, j))[0]
+                if current>current_g_n:
+                    current_g_n = current
+                    current_i_n = splits(g+1,resulting_hand(hand, j))[1]
+                elif current == current_g_n:
+                    if splits(g+1,resulting_hand(hand, j))[1] > current_i_n:
+                        current_i_n = splits(g+1,resulting_hand(hand, j))[1]
+
 
             for j in set_triplets:
-                current = shanten(resulting_hand(hand, j))+2
-                if current>current_shanten:
-                    current_shanten = current
-            return current_shanten
-        def shanten_honours(hand):
-            current_shanten=0
-            for i in hand:
-                if i > 2:
-                    current_shanten += 2
-                if i == 2:
-                    current_shanten += 1
-            return current_shanten
-        return 8 -(shanten(hand[0]) + shanten(hand[1]) + shanten(hand[2]) + shanten_honours(hand[3]))
+                current = splits(g+1,resulting_hand(hand, j))[0]
+                if current>current_g_n:
+                    current_g_n = current
+                    current_i_n = splits(g+1,resulting_hand(hand, j))[1]
+                elif current == current_g_n:
+                    if splits(g+1,resulting_hand(hand, j))[1] > current_i_n:
+                        current_i_n = splits(g+1,resulting_hand(hand, j))[1]
+            return current_g_n, current_i_n
+    
+        def splits_fullhand(hand):
+            current_split = [0,0]
+            for i in hand[:3]:
+                current_split[0] += splits(0, i)[0]
+                current_split[1] += splits(0, i)[1]
+            for i in hand[3]:
+                if i == 3:
+                    current_split[0] += 1
+                elif i == 2:
+                    current_split[1] +=1
+            return current_split
+
+        def shanten(hand):
+            split_arr = splits_fullhand(hand)
+            i = split_arr[1]
+            g = split_arr[0]
+            return 8 - 2*g - min(i, 4-g) - min(1, max(0,i-4+g))
+        
+        return shanten(hand)
     
 
     def calcTileEff(self, hand):
