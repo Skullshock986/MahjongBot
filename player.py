@@ -115,7 +115,7 @@ class Player:
                     out[i] = 2
                     possible_pairs.append(out)
             return possible_pairs
-
+        
         def triplets(suit_arr):
             possible_triplets=[]
 
@@ -125,7 +125,7 @@ class Player:
                     out[i] = 3
                     possible_triplets.append(out)
             return possible_triplets
-
+        
         def complete_sequences(suit_arr):
             possible_sequences=[]
             for i in range(2,9):
@@ -136,7 +136,7 @@ class Player:
                     out[i-2]=1
                     possible_sequences.append(out)
             return possible_sequences
-
+        
         def incomplete_sequences(suit_arr):
             possible_insequences=[]
             if suit_arr[0]>0 and suit_arr[1]>0:
@@ -163,58 +163,73 @@ class Player:
                 out[i] = arr1[i] - arr2[i]
             return out
         
+
         def splits_nogroups(hand):
             set_insequences = incomplete_sequences(hand)
             current_shan=0
             set_pairs = pairs(hand)
-
-            for i in set_insequences:
-                current = splits_nogroups(resulting_hand(hand, i))+1
-                if current > current_shan:
-                    current_shan = current
+            pair_bool = False
 
             for i in set_pairs:
-                current = splits_nogroups(resulting_hand(hand, i))+1
+                pair_bool = True
+                current = splits_nogroups(resulting_hand(hand, i))[0]+1
                 if current>current_shan:
                     current_shan = current
-            return current_shan
+
+            for i in set_insequences:
+                current = splits_nogroups(resulting_hand(hand, i))[0]+1
+                if current > current_shan:
+                    current_shan = current
+                    pair_bool = False
+
+            return current_shan, pair_bool
+
 
         def splits(g, hand):          #******
             current_g_n = g
-            current_i_n = 0                             
+            current_i_n = 0 
+            pair_presance = False                            
             set_pairs = pairs(hand)
             set_seq = complete_sequences(hand)
             set_triplets = triplets(hand)
 
             if len(set_seq) == 0  and len(set_triplets) == 0:
-                return g, splits_nogroups(hand)
-
+                return g, splits_nogroups(hand)[0], splits_nogroups(hand)[1]
 
             for j in set_seq:
                 current = splits(g+1, resulting_hand(hand, j))[0]
                 if current>current_g_n:
                     current_g_n = current
                     current_i_n = splits(g+1,resulting_hand(hand, j))[1]
+                    pair_presance = splits(g+1,resulting_hand(hand, j))[2] #*
                 elif current == current_g_n:
                     if splits(g+1,resulting_hand(hand, j))[1] > current_i_n:
                         current_i_n = splits(g+1,resulting_hand(hand, j))[1]
-
+                        pair_presance = splits(g+1,resulting_hand(hand, j))[2] #*
 
             for j in set_triplets:
                 current = splits(g+1,resulting_hand(hand, j))[0]
                 if current>current_g_n:
                     current_g_n = current
                     current_i_n = splits(g+1,resulting_hand(hand, j))[1]
+                    pair_presance = splits(g+1,resulting_hand(hand, j))[2] #*
                 elif current == current_g_n:
                     if splits(g+1,resulting_hand(hand, j))[1] > current_i_n:
                         current_i_n = splits(g+1,resulting_hand(hand, j))[1]
-            return current_g_n, current_i_n
-    
+                        pair_presance = splits(g+1,resulting_hand(hand, j))[2] #*
+
+            return current_g_n,current_i_n,pair_presance
+        
+
         def splits_fullhand(hand):
-            current_split = [0,0]
+            current_split = [0,0,False]
             for i in hand[:3]:
-                current_split[0] += splits(0, i)[0]
-                current_split[1] += splits(0, i)[1]
+                current_arr = splits(0, i)
+                current_split[0] += current_arr[0]
+                current_split[1] += current_arr[1]
+                if current_arr[2] == True:
+                    current_split[2] = True
+
             for i in hand[3]:
                 if i == 3:
                     current_split[0] += 1
@@ -222,14 +237,22 @@ class Player:
                     current_split[1] +=1
             return current_split
 
+
         def shanten(hand):
             split_arr = splits_fullhand(hand)
             i = split_arr[1]
             g = split_arr[0]
+            pair_presence = split_arr[2]
+
+            #checking for the edge case:
+            if g == 3 and pair_presence == False:
+                return 1
             return 8 - 2*g - min(i, 4-g) - min(1, max(0,i-4+g))
         
+
         return shanten(hand)
     
+
 
     def calcTileEff(self, hand):
         return random.randint(1,30)
