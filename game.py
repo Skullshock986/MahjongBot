@@ -12,16 +12,17 @@ class Game:
         self.tilePool = start_tiles
         self.dora = []
         self.prevWind = prevWind
-        self.seats = ["n", "e", "s", "w"]
-        self.discardPiles = {"n": [], "e": [], "s": [], "w": [] }
+        self.seats = ["e", "s", "w", "n"]
+        self.discardPiles = {"e": [], "s": [], "w": [], "n" : []}
         self.over=False
+        self.deadWall = [[self.drawTile() for i in range(7)] for j in range(2)]
 
         self.chooseDora()
         self.players = [Player(self.drawHand(), self.chooseSeat()) for i in range(4)]
 
     def chooseDora(self):
-        self.dora.append(self.drawTile())
-
+        l = len(self.dora)
+        self.dora.append(self.deadWall[0][2+l])
 
     def drawHand(self):
         self.tempHandArray = []
@@ -42,9 +43,7 @@ class Game:
             return None
 
     def chooseSeat(self):
-        seat = random.choice(self.seats)
-        self.seats.remove(seat)
-
+        seat = self.seats.pop(0)
         return seat
 
     def main(self):

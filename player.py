@@ -13,12 +13,12 @@ class Player:
     
     def discard(self, drawnTile: str): #Eventually will be filled with a method to select a discard, then return new hand and the discard tile
 
-        print(self._hand)
+        print(self.format_hand(self._hand))
         print()
 
         self._hand.append(drawnTile) #append 14th tile to hand
 
-        print(self._hand)
+        print(self.format_hand(self._hand))
         print()
 
         discardPossibilities = []
@@ -40,7 +40,7 @@ class Player:
 
         self._hand.remove(discardTile)
         
-        print(self._hand)
+        print(self.format_hand(self._hand))
         print()
 
         return (discardTile)
