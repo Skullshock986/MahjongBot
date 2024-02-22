@@ -55,8 +55,15 @@ class Game:
                     if not draw:
                         self.over = True
                         break
-            
-                    print(player.getSeat() , "'s turn")
+                    
+                    windDict = {
+                        "e": "East",
+                        "s": "South",
+                        "w": "West",
+                        "n" : "North"
+                    }
+
+                    print(windDict[player.getSeat()] , "Player's turn")
                     discard = player.discard(draw)
                     self.discardPiles[player.getSeat()].append(discard)
 
