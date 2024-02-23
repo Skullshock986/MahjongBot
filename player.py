@@ -273,12 +273,13 @@ class Player:
             i = split_arr[1]
             g = split_arr[0]
             pair_presence = split_arr[2]
-            p=0
 
             #checking for the edge case:
-            if i >= 5-g and pair_presence == False:
-                p=1
-            return 8 - 2*g - min(i, 4-g) - min(1, max(0,i-4+g))+p         #splits_nogroups needs to be changed: the usefulness of taatsu caps out at a point, at which pairs should be prioritsed i think
+            if g == 3 and i==2 and pair_presence == False:
+                return 1
+            if g == 2 and i == 3 and pair_presence == False:
+                return 2
+            return 8 - 2*g - min(i, 4-g) - min(1, max(0,i-4+g))
         
 
         return shanten(handArray)
