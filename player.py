@@ -270,20 +270,44 @@ class Player:
             return current_split
 
 
-        def shanten(handArray):
+        def general_shanten(handArray):
             split_arr = splits_fullhand(handArray)
             i = split_arr[1]
             g = split_arr[0]
             pair_presence = split_arr[2]
             p=0
 
-
             #checking for the edge cases:
             if i >= 5-g and pair_presence == False:
                 p=1
             return 8 - 2*g - min(i, 4-g) - min(1, max(0,i+g-4)) + p
 
-        return shanten(handArray)
+        
+        def chiitoistu_shanten(handArray):
+            pairs = 0
+            for suit in handArray:
+                for num in handArray:
+                    pairs += num//2      #counts number of pairs, 4 of the same tile are treated as 2 pairs
+            return 6 - pairs
+        
+        def orphanSource_shanten(handArray):
+            diffTerminals = 0
+            pairsTerminals = 0
+            pair_const = 0
+            for i in (0,8):                  #iterates over numbered suits
+                for suit in handArray[:3]:
+                    pairsTerminals += min(1, suit[i]//2)
+                    diffTerminals += min(1, suit[i]//1)
+
+            for num in handArray[3]:        #iterates over honours
+                    pairsTerminals += min(1, num//2)
+                    diffTerminals += min(1, num//1)
+            if pairsTerminals > 0:
+                pair_const=1
+            return 13 - diffTerminals - pair_const
+
+       
+        return min(general_shanten(handArray), chiitoistu_shanten(handArray), orphanSource_shanten(handArray))
     
 
 
