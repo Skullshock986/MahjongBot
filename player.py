@@ -67,7 +67,7 @@ class Player:
 
         self._hand.remove(discardTile)
         
-        print("Post discard")
+        print("Post discard: ", discardTile)
         print(self.format_hand(self._hand))
         print()
 
