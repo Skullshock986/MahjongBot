@@ -286,7 +286,7 @@ class Player:
         def chiitoistu_shanten(handArray):
             pairs = 0
             for suit in handArray:
-                for num in handArray:
+                for num in suit:
                     pairs += num//2      #counts number of pairs, 4 of the same tile are treated as 2 pairs
             return 6 - pairs
         
