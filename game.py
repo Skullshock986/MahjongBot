@@ -47,7 +47,9 @@ class Game:
         return seat
 
     def main(self):
+        turn = 0
         while not self.over:
+            turn+=1
             for player in self.players:
                 if not self.over:
                     draw = self.drawTile()
@@ -63,7 +65,7 @@ class Game:
                         "n" : "North"
                     }
 
-                    print(windDict[player.getSeat()] , "Player's turn")
+                    print(windDict[player.getSeat()] , "Player's turn, Turn: ", turn)
                     discard = player.discard(draw)
                     self.discardPiles[player.getSeat()].append(discard)
 
