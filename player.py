@@ -214,38 +214,40 @@ class Player:
             return current_shan, pair_bool
 
 
-        def splits(g, handArray):         
-            current_g_n = g
-            current_i_n = 0 
-            pair_presance = False                            
-            set_pairs = pairs(handArray)
-            set_seq = complete_sequences(handArray)
-            set_triplets = triplets(handArray)
+        def splits(g, hand):          #******
+            current_g_n = g           #number of groups
+            current_i_n = 0           #number of taatsu
+            pair_presance = False     #used for an edge case(s?)                            
+            set_pairs = pairs(hand)
+            set_seq = complete_sequences(hand)
+            set_triplets = triplets(hand)
 
-            if len(set_seq) == 0  and len(set_triplets) == 0:
-                return g, splits_nogroups(handArray)[0], splits_nogroups(handArray)[1]
+            if len(set_seq) == 0  and len(set_triplets) == 0:                    #if no more groups then counts maximum of taatsu
+                return g, splits_nogroups(hand)[0], splits_nogroups(hand)[1]
 
             for j in set_seq:
-                current = splits(g+1, resulting_hand(handArray, j))[0]
+                current_split = splits(g+1, resulting_hand(hand, j))   
+                current = current_split[0]
                 if current>current_g_n:
                     current_g_n = current
-                    current_i_n = splits(g+1,resulting_hand(handArray, j))[1]
-                    pair_presance = splits(g+1,resulting_hand(handArray, j))[2] #*
+                    current_i_n = current_split[1]
+                    pair_presance = current_split[2] #*
                 elif current == current_g_n:
-                    if splits(g+1,resulting_hand(handArray, j))[1] > current_i_n:
-                        current_i_n = splits(g+1,resulting_hand(handArray, j))[1]
-                        pair_presance = splits(g+1,resulting_hand(handArray, j))[2] #*
+                    if current_split[1] > current_i_n:
+                        current_i_n = current_split[1]
+                        pair_presance = current_split[2] #*
 
             for j in set_triplets:
-                current = splits(g+1,resulting_hand(handArray, j))[0]
+                current_split = splits(g+1, resulting_hand(hand, j))
+                current = current_split[0]
                 if current>current_g_n:
                     current_g_n = current
-                    current_i_n = splits(g+1,resulting_hand(handArray, j))[1]
-                    pair_presance = splits(g+1,resulting_hand(handArray, j))[2] #*
+                    current_i_n = current_split[1]
+                    pair_presance = current_split[2] #*
                 elif current == current_g_n:
-                    if splits(g+1,resulting_hand(handArray, j))[1] > current_i_n:
-                        current_i_n = splits(g+1,resulting_hand(handArray, j))[1]
-                        pair_presance = splits(g+1,resulting_hand(handArray, j))[2] #*
+                    if current_split[1] > current_i_n:
+                        current_i_n = current_split[1]
+                        pair_presance = current_split[2] #*
 
             return current_g_n,current_i_n,pair_presance
         
@@ -273,14 +275,13 @@ class Player:
             i = split_arr[1]
             g = split_arr[0]
             pair_presence = split_arr[2]
+            p=0
 
-            #checking for the edge case:
-            if g == 3 and i==2 and pair_presence == False:
-                return 1
-            if g == 2 and i == 3 and pair_presence == False:
-                return 2
-            return 8 - 2*g - min(i, 4-g) - min(1, max(0,i-4+g))
-        
+
+            #checking for the edge cases:
+            if i >= 5-g and pair_presence == False:
+                p=1
+            return 8 - 2*g - min(i, 4-g) - min(1, max(0,i+g-4)) + p
 
         return shanten(handArray)
     
