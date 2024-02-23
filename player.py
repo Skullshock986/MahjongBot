@@ -313,3 +313,43 @@ class Player:
 
     def calcTileEff(self, hand):
         return random.randint(1,30)
+
+
+    def simulateDiscard(self, hand, drawnTile: str): #Eventually will be filled with a method to select a discard, then return new hand and the discard tile
+
+        print()
+        print("Current Hand")
+        print(self.format_hand(hand))
+        print()
+
+        hand.append(drawnTile) #append 14th tile to hand
+
+        print("Draw Tile: ", drawnTile)
+        print(self.format_hand(hand))
+        print()
+
+        discardPossibilities = []
+        for i in range(len(hand)): 
+
+            tempHand = hand[:i] + hand[i+1:]
+
+            tempScore = self.format_hand(tempHand)
+            discardPossibilities.append((hand[i] , tempScore))  
+        
+        discardPossibilities.sort(key=lambda x: (x[1]["shanten"], -x[1]["tileEff"]))
+        
+        # Commented out the discard analysis
+        # for item in discardPossibilities:
+        #     print(item)
+        #     print()
+
+        discardTile = discardPossibilities[0][0]
+        shanten = discardPossibilities[0][1]["shanten"]
+
+        hand.remove(discardTile)
+        
+        print("Post discard: ", discardTile)
+        print(self.format_hand(hand))
+        print()
+
+        return (discardTile, shanten)

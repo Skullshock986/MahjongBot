@@ -13,12 +13,12 @@ class Game:
         self.dora = []
         self.prevWind = prevWind
         self.seats = ["e", "s", "w", "n"]
-        self.discardPiles = {"e": [], "s": [], "w": [], "n" : []}
+        self.discardPiles = {"e": [], "s": [], "w": [], "n" : [], "total" : []}
         self.over=False
         self.deadWall = [[self.drawTile() for i in range(7)] for j in range(2)]
 
         self.chooseDora()
-        self.players = [Player(self.drawHand(), self.chooseSeat()) for i in range(4)]
+        self.players = [Player(["e_wind", "w_wind", "n_wind", "s_wind", "g_dragon", "r_dragon", "1_char", "9_char", "1_bamb", "5_char", "4_bamb", "6_circ", "8_bamb"], self.chooseSeat())] + [Player(self.drawHand(), self.chooseSeat()) for i in range(3)]
 
     def chooseDora(self):
         l = len(self.dora)
@@ -68,6 +68,7 @@ class Game:
                     print(windDict[player.getSeat()] , "Player's turn, Turn: ", turn)
                     discard = player.discard(draw)
                     self.discardPiles[player.getSeat()].append(discard)
+                    self.discardPiles["total"].append(discard)
 
         
         
