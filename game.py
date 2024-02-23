@@ -10,8 +10,15 @@ with open('tiles.json', 'r') as file:
 class Game:
     def __init__(self, prevWind = "e") -> None:
         self.tilePool = start_tiles
+        self.turn = 0
         self.dora = []
         self.prevWind = prevWind
+        self.windDict = {
+                        "e": "East",
+                        "s": "South",
+                        "w": "West",
+                        "n" : "North"
+                    }
         self.seats = ["e", "s", "w", "n"]
         self.discardPiles = {"e": [], "s": [], "w": [], "n" : [], "total" : []}
         self.over=False
@@ -47,9 +54,8 @@ class Game:
         return seat
 
     def main(self):
-        turn = 0
         while not self.over:
-            turn+=1
+            self.turn+=1
             for player in self.players:
                 if not self.over:
                     draw = self.drawTile()
@@ -58,18 +64,22 @@ class Game:
                         self.over = True
                         break
                     
-                    windDict = {
-                        "e": "East",
-                        "s": "South",
-                        "w": "West",
-                        "n" : "North"
-                    }
 
-                    print(windDict[player.getSeat()] , "Player's turn, Turn: ", turn)
+                    print(self.windDict[player.getSeat()] , "Player's turn, Turn: ", self.turn)
                     discard = player.discard(draw)
+                    if not discard:
+                        print(self.windDict[player.getSeat()], "Says: TSUMO!, on turn", self.turn)
+                        self.over=True
+                        break
+
                     self.discardPiles[player.getSeat()].append(discard)
                     self.discardPiles["total"].append(discard)
 
+                    for ronningPlayer in self.players:
+                        if ronningPlayer.ron():
+                            print(self.windDict[ronningPlayer.getSeat()], "Says: RON! on Turn: ", self.turn)
+                            self.over = True
+                            break
         
         
 

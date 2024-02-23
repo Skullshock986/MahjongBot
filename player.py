@@ -1,8 +1,6 @@
 
 import random
 
-from game import Game
-
 class Player:
     def __init__(self, hand: list, seat, game) -> None:
         self._hand = hand #Would be ideal to ensure the list is sorted, either we can implement it into the constructor at this stage or we can check it at the input stage idk which is better
@@ -12,6 +10,17 @@ class Player:
     
     def getSeat(self):
         return self._seat
+    
+    def ron(self):
+        latestTile = self._game.discardPiles["total"][-1] #tile in json format ie: 3_char
+        self._hand.append(latestTile)
+        handScore = self.format_hand(self._hand)
+
+        if handScore["shanten"] == -1:
+            return True
+        else:
+            return False
+
     
     def webFormat(self, handArray):
         dict = {0: 'm',
@@ -46,9 +55,14 @@ class Player:
 
         self._hand.append(drawnTile) #append 14th tile to hand
 
+        formatHand = self.format_hand(self._hand)
+
         print("Draw Tile: ", drawnTile)
-        print(self.format_hand(self._hand))
+        print(formatHand)
         print()
+
+        if formatHand["shanten"] == -1:
+            return None
 
         discardPossibilities = []
         for i in range(len(self._hand)): 
@@ -300,6 +314,7 @@ class Player:
                 for suit in handArray[:3]:
                     pairsTerminals += min(1, suit[i]//2)
                     diffTerminals += min(1, suit[i]//1)
+
 
             for num in handArray[3]:        #iterates over honours
                     pairsTerminals += min(1, num//2)
