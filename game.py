@@ -18,7 +18,7 @@ class Game:
         self.deadWall = [[self.drawTile() for i in range(7)] for j in range(2)]
 
         self.chooseDora()
-        self.players = [Player(["e_wind", "w_wind", "n_wind", "s_wind", "g_dragon", "r_dragon", "1_char", "9_char", "1_bamb", "5_char", "4_bamb", "6_circ", "8_bamb"], self.chooseSeat())] + [Player(self.drawHand(), self.chooseSeat()) for i in range(3)]
+        self.players = [Player(self.drawHand(), self.chooseSeat(), self) for i in range(4)]
 
     def chooseDora(self):
         l = len(self.dora)

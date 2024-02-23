@@ -4,9 +4,10 @@ import random
 from game import Game
 
 class Player:
-    def __init__(self, hand: list, seat) -> None:
+    def __init__(self, hand: list, seat, game) -> None:
         self._hand = hand #Would be ideal to ensure the list is sorted, either we can implement it into the constructor at this stage or we can check it at the input stage idk which is better
         self._seat = seat
+        self._game = game
         self._dealer = True if seat == "e" else False
     
     def getSeat(self):
