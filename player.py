@@ -1,4 +1,5 @@
 
+import json
 import random
 
 class Player:
@@ -15,12 +16,15 @@ class Player:
         latestTile = self._game.discardPiles["total"][-1] #tile in json format ie: 3_char
         self._hand.append(latestTile)
         handScore = self.format_hand(self._hand)
+        self._hand.pop(-1)
 
         if handScore["shanten"] == -1:
-            return True
+            return handScore
         else:
-            return False
+            return None
 
+    def getHand(self):
+        return self._hand
     
     def webFormat(self, handArray):
         dict = {0: 'm',
@@ -144,7 +148,7 @@ class Player:
             "displayHand" : handDict,
             "webFormat" : self.webFormat(handArray),
             "shanten" : self.calcShanten(handArray),
-            "tileEff" : self.calcTileEff(handArray)
+            "tileEff" : self.calcTileEff(handArray, self._game.discardPiles["total"])
         }
 
         return handScore
@@ -328,22 +332,68 @@ class Player:
     
 
 
-    def calcTileEff(self, hand):
-        return random.randint(1,34)
+    def calcTileEff(self, hand, discardPile):
+        count = 0
+        formatHand = self.format_hand(hand)
+        sh1 = formatHand["shanten"]
 
+        if sh1 == -1:
+            return 0
+        
+        with open('tiles.json', 'r') as file:
+            start_tiles = json.load(file)
+
+        tilePool = start_tiles
+
+        #tilePool represents all tiles that exist
+
+        for tile in self._game.dora: #remove dora tiles
+            tilePool[tile] -= 1
+
+        for tile in discardPile:
+            tilePool[tile] -= 1
+
+        for tile in hand: #remove tiles in hand
+            tilePool[tile] -= 1
+
+
+        for tile in tilePool:
+            handCopy = hand[:]
+            discardPileCopy = discardPile[:]
+            
+            discardTile, sh2 = self.simulateDiscard(handCopy)
+
+            if not discardTile:
+                return 1
+
+            discardPileCopy.append(discardTile)
+            tilePool[discardTile] -= 1
+
+            if sh1 < sh2:
+                numTiles = tilePool[tile] 
+                count+=numTiles
+            elif sh1 == sh2:
+                return self.calcTileEff(handCopy, discardPileCopy)
+
+        return count
 
     def simulateDiscard(self, hand, drawnTile: str): #Eventually will be filled with a method to select a discard, then return new hand and the discard tile
 
-        print()
-        print("Current Hand")
-        print(self.format_hand(hand))
-        print()
+        # print()
+        # print("Current Hand")
+        # print(self.format_hand(hand))
+        # print()
 
         hand.append(drawnTile) #append 14th tile to hand
 
-        print("Draw Tile: ", drawnTile)
-        print(self.format_hand(hand))
-        print()
+        formatHand = self.format_hand(hand)
+
+        # print("Draw Tile: ", drawnTile)
+        # print(formatHand)
+        # print()
+
+        if formatHand["shanten"] == -1:
+            return (None, None)
 
         discardPossibilities = []
         for i in range(len(hand)): 
@@ -361,12 +411,11 @@ class Player:
         #     print()
 
         discardTile = discardPossibilities[0][0]
-        shanten = discardPossibilities[0][1]["shanten"]
-
+        shanten  = discardPossibilities[0][1]["shanten"]
         hand.remove(discardTile)
         
-        print("Post discard: ", discardTile)
-        print(self.format_hand(hand))
-        print()
+        # print("Post discard: ", discardTile)
+        # print(self.format_hand(hand))
+        # print()
 
         return (discardTile, shanten)

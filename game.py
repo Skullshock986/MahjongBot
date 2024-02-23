@@ -69,6 +69,11 @@ class Game:
                     discard = player.discard(draw)
                     if not discard:
                         print(self.windDict[player.getSeat()], "Says: TSUMO!, on turn", self.turn)
+                        hand = player.getHand()
+                        handScore = player.format_hand(hand)
+                        winningTile = hand[-1]
+                        print(("t", winningTile, handScore))
+                        print()
                         self.over=True
                         break
 
@@ -76,8 +81,12 @@ class Game:
                     self.discardPiles["total"].append(discard)
 
                     for ronningPlayer in self.players:
-                        if ronningPlayer.ron():
+                        handScore = ronningPlayer.ron()
+                        if handScore != None:
                             print(self.windDict[ronningPlayer.getSeat()], "Says: RON! on Turn: ", self.turn)
+                            winningTile = self.discardPiles["total"][-1]
+                            print(("r", winningTile, handScore))
+                            print()
                             self.over = True
                             break
         
