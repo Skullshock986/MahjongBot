@@ -1,6 +1,7 @@
 
 import random
 
+from game import Game
 
 class Player:
     def __init__(self, hand: list, seat) -> None:
