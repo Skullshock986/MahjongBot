@@ -15,7 +15,7 @@ class Player:
     def ron(self):
         latestTile = self._game.discardPiles["total"][-1] #tile in json format ie: 3_char
         self._hand.append(latestTile)
-        handScore = self.format_hand(self._hand)
+        handScore = self.format_and_score_hand(self._hand)
         self._hand.pop(-1)
 
         if handScore["shanten"] == -1:
@@ -54,12 +54,12 @@ class Player:
 
         print()
         print("Current Hand")
-        print(self.format_hand(self._hand))
+        print(self.format_and_score_hand(self._hand))
         print()
 
         self._hand.append(drawnTile) #append 14th tile to hand
 
-        formatHand = self.format_hand(self._hand)
+        formatHand = self.format_and_score_hand(self._hand)
 
         print("Draw Tile: ", drawnTile)
         print(formatHand)
@@ -73,7 +73,7 @@ class Player:
 
             tempHand = self._hand[:i] + self._hand[i+1:]
 
-            tempScore = self.format_hand(tempHand)
+            tempScore = self.format_and_score_hand(tempHand)
             discardPossibilities.append((self._hand[i] , tempScore))  
         
         discardPossibilities.sort(key=lambda x: (x[1]["shanten"], -x[1]["tileEff"]))
@@ -88,13 +88,17 @@ class Player:
         self._hand.remove(discardTile)
         
         print("Post discard: ", discardTile)
-        print(self.format_hand(self._hand))
+        print(self.format_and_score_hand(self._hand))
         print()
 
         return (discardTile)
 
-    def format_hand(self, hand) : #The intent is to separate the raw hand into sublists with integer values for each suit and an integer count of the honour tiles
+    def getShanten(self,hand):
+        shanten = self.calcShanten(self.format_hand(hand)["calcHand"])
+        return shanten
         
+
+    def format_hand(self,hand):
 
         handDict = {
             "char": [],   # Hopefully this will be useful for calculating shanten and similar operations
@@ -143,12 +147,25 @@ class Player:
                         handDict[item] +=1
                         
                         handArray[3][honorsDict[item]] +=1
+        
+        formattedHand = {
+            "displayHand" : handDict,
+            "calcHand" : handArray,
+            "webFormat" : self.webFormat(handArray),
+        }
+
+        return formattedHand
+
+
+    def format_and_score_hand(self, hand) : #The intent is to separate the raw hand into sublists with integer values for each suit and an integer count of the honour tiles
+        
+        formattedHand = self.format_hand(hand)
 
         handScore = {
-            "displayHand" : handDict,
-            "webFormat" : self.webFormat(handArray),
-            "shanten" : self.calcShanten(handArray),
-            "tileEff" : self.calcTileEff(handArray, self._game.discardPiles["total"])
+            "displayHand" : formattedHand["displayHand"],
+            "webFormat" : formattedHand["webFormat"],
+            "shanten" : self.calcShanten(formattedHand["calcHand"]),
+            "tileEff" : self.calcTileEff(hand, self._game.discardPiles["total"])
         }
 
         return handScore
@@ -334,8 +351,7 @@ class Player:
 
     def calcTileEff(self, hand, discardPile):
         count = 0
-        formatHand = self.format_hand(hand)
-        sh1 = formatHand["shanten"]
+        sh1 = self.getShanten(hand)
 
         if sh1 == -1:
             return 0
@@ -361,7 +377,7 @@ class Player:
             handCopy = hand[:]
             discardPileCopy = discardPile[:]
             
-            discardTile, sh2 = self.simulateDiscard(handCopy)
+            discardTile, sh2 = self.simulateDiscard(handCopy, tile)
 
             if not discardTile:
                 return 1
@@ -369,11 +385,11 @@ class Player:
             discardPileCopy.append(discardTile)
             tilePool[discardTile] -= 1
 
-            if sh1 < sh2:
+            if sh2 < sh1:
                 numTiles = tilePool[tile] 
                 count+=numTiles
-            elif sh1 == sh2:
-                return self.calcTileEff(handCopy, discardPileCopy)
+            # elif sh1 == sh2:
+            #     return self.calcTileEff(handCopy, discardPileCopy)
 
         return count
 
@@ -381,18 +397,18 @@ class Player:
 
         # print()
         # print("Current Hand")
-        # print(self.format_hand(hand))
+        # print(self.format_and_score_hand(hand))
         # print()
 
         hand.append(drawnTile) #append 14th tile to hand
 
-        formatHand = self.format_hand(hand)
+        drawnShanten = self.getShanten(hand)
 
         # print("Draw Tile: ", drawnTile)
         # print(formatHand)
         # print()
 
-        if formatHand["shanten"] == -1:
+        if drawnShanten == -1:
             return (None, None)
 
         discardPossibilities = []
@@ -400,10 +416,10 @@ class Player:
 
             tempHand = hand[:i] + hand[i+1:]
 
-            tempScore = self.format_hand(tempHand)
+            tempScore = self.getShanten(tempHand)
             discardPossibilities.append((hand[i] , tempScore))  
         
-        discardPossibilities.sort(key=lambda x: (x[1]["shanten"], -x[1]["tileEff"]))
+        discardPossibilities.sort(key=lambda x: (x[1]))
         
         # Commented out the discard analysis
         # for item in discardPossibilities:
@@ -411,11 +427,11 @@ class Player:
         #     print()
 
         discardTile = discardPossibilities[0][0]
-        shanten  = discardPossibilities[0][1]["shanten"]
+        shanten  = discardPossibilities[0][1]
         hand.remove(discardTile)
         
         # print("Post discard: ", discardTile)
-        # print(self.format_hand(hand))
+        # print(self.format_and_score_hand(hand))
         # print()
 
         return (discardTile, shanten)
