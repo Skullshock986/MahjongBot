@@ -329,7 +329,7 @@ class Player:
 
 
     def calcTileEff(self, hand):
-        tile = "bom"
+        return random.randint(1,34)
 
 
     def simulateDiscard(self, hand, drawnTile: str): #Eventually will be filled with a method to select a discard, then return new hand and the discard tile
