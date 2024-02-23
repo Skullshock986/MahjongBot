@@ -165,7 +165,9 @@ class Player:
             "displayHand" : formattedHand["displayHand"],
             "webFormat" : formattedHand["webFormat"],
             "shanten" : self.calcShanten(formattedHand["calcHand"]),
-            "tileEff" : self.calcTileEff(hand, self._game.discardPiles["total"])
+            "tileEff" : self.calcTileEff(hand, self._game.discardPiles["total"]),
+            "discardPile" : self._game.discardPiles["total"],
+            "dora": self._game.dora
         }
 
         return handScore
