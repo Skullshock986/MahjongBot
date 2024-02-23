@@ -381,11 +381,9 @@ class Player:
             
             discardTile, sh2 = self.simulateDiscard(handCopy, tile)
 
-            if not discardTile:
-                return(1,1)
-
-            discardPileCopy.append(discardTile)
-            tilePool[discardTile] -= 1
+            if discardTile:
+                discardPileCopy.append(discardTile)
+                tilePool[discardTile] -= 1
 
             if sh2 < sh1:
                 numTiles = tilePool[tile] 
@@ -413,7 +411,7 @@ class Player:
         # print()
 
         if drawnShanten == -1:
-            return (None, None)
+            return (None, -1)
 
         discardPossibilities = []
         for i in range(len(hand)): 
