@@ -76,7 +76,7 @@ class Player:
             tempScore = self.format_and_score_hand(tempHand)
             discardPossibilities.append((self._hand[i] , tempScore))  
         
-        discardPossibilities.sort(key=lambda x: (x[1]["shanten"], -x[1]["tileEff"]))
+        discardPossibilities.sort(key=lambda x: (x[1]["shanten"], -x[1]["tileEff"][0]))
         
         # Commented out the discard analysis
         # for item in discardPossibilities:
@@ -351,10 +351,12 @@ class Player:
 
     def calcTileEff(self, hand, discardPile):
         count = 0
+        kinds = 0
+
         sh1 = self.getShanten(hand)
 
         if sh1 == -1:
-            return 0
+            return (0, 0)
         
         with open('tiles.json', 'r') as file:
             start_tiles = json.load(file)
@@ -380,7 +382,7 @@ class Player:
             discardTile, sh2 = self.simulateDiscard(handCopy, tile)
 
             if not discardTile:
-                return 1
+                return(1,1)
 
             discardPileCopy.append(discardTile)
             tilePool[discardTile] -= 1
@@ -388,10 +390,12 @@ class Player:
             if sh2 < sh1:
                 numTiles = tilePool[tile] 
                 count+=numTiles
+                kinds += 1
             # elif sh1 == sh2:
             #     return self.calcTileEff(handCopy, discardPileCopy)
 
-        return count
+        return count, kinds
+    
 
     def simulateDiscard(self, hand, drawnTile: str): #Eventually will be filled with a method to select a discard, then return new hand and the discard tile
 
