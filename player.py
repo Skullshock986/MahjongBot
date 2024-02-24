@@ -253,40 +253,40 @@ class Player:
             return current_shan, pair_bool
 
 
-        def splits(g, hand):          #******
-            current_g_n = g           #number of groups
-            current_i_n = 0           #number of taatsu
-            pair_presance = False     #used for an edge case(s?)                            
-            set_pairs = pairs(hand)
+        def splits(g, hand):                  #******
+            current_g_n = g                   #number of groups
+            current_i_n = 0                   #number of taatsu
+            pair_presance = False             #used for an edge case(s?)                            
             set_seq = complete_sequences(hand)
             set_triplets = triplets(hand)
 
-            if len(set_seq) == 0  and len(set_triplets) == 0:                    #if no more groups then counts maximum of taatsu
-                return g, splits_nogroups(hand)[0], splits_nogroups(hand)[1]
-
             for j in set_seq:
-                current_split = splits(g+1, resulting_hand(hand, j))   
+                current_split = splits(g+1, resulting_hand(hand,j))   
                 current = current_split[0]
                 if current>current_g_n:
                     current_g_n = current
                     current_i_n = current_split[1]
-                    pair_presance = current_split[2] #*
+                    pair_presance = current_split[2]   #*
                 elif current == current_g_n:
                     if current_split[1] > current_i_n:
                         current_i_n = current_split[1]
-                        pair_presance = current_split[2] #*
+                        pair_presance = current_split[2]   #*
 
             for j in set_triplets:
-                current_split = splits(g+1, resulting_hand(hand, j))
+                current_split = splits(g+1, resulting_hand(hand,j))
                 current = current_split[0]
                 if current>current_g_n:
                     current_g_n = current
                     current_i_n = current_split[1]
-                    pair_presance = current_split[2] #*
+                    pair_presance = current_split[2]   #*
                 elif current == current_g_n:
                     if current_split[1] > current_i_n:
                         current_i_n = current_split[1]
-                        pair_presance = current_split[2] #*
+                        pair_presance = current_split[2]   #*
+                        
+            if (not set_seq) and (not set_triplets):     #if no more groups then counts maximum of taatsu    
+                s=splits_nogroups(hand)
+                return g, s[0], s[1]
 
             return current_g_n,current_i_n,pair_presance
         
