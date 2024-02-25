@@ -1,4 +1,5 @@
 
+from collections import Counter
 import json
 import random
 
@@ -62,7 +63,7 @@ class Player:
         formatHand = self.format_and_score_hand(self._hand)
 
         print("Draw Tile: ", drawnTile)
-        print(formatHand)
+        print(formatHand["displayHand"], formatHand["shanten"])
         print()
 
         if formatHand["shanten"] == -1:
@@ -353,6 +354,9 @@ class Player:
     def calcTileEff(self, hand, discardPile):
         count = 0
         kinds = 0
+        tilesInHand = 0
+        tilesInDiscard = 0
+        tilesInDora = 0
 
         initial_shanten = self.getShanten(hand)
 
@@ -363,19 +367,32 @@ class Player:
             start_tiles = json.load(file)
 
         for tile in start_tiles:
-            handCopy = hand[:]
-            discardPileCopy = discardPile[:]
+            handCopy = list(hand)
+            discardPileCopy = list(discardPile)
             
             discardTile, sh2 = self.simulateDiscard(handCopy, tile)
 
             if sh2 < initial_shanten:
-                numTiles = start_tiles[tile] 
-                count+= 4 #-dora-tiles in hand-tiles in discard pile
+                
+                tileInHand = self.countInList(hand, tile)
+                tileInDiscard = self.countInList(self._game.discardPiles["total"], tile)
+                tileInDora = self.countInList(self._game.dora, tile)
+                count+= max((4 - tileInDora -  tilesInDiscard - tileInHand ), 0)
                 kinds+=1
+                tilesInHand += tileInHand
+                tileInDiscard += tileInDiscard
+                tilesInDora += tileInDora
 
-        return count, kinds
+
+
+        return count, kinds, tilesInHand, tilesInDiscard, tilesInDora
     
-    
+    def countInList(self, lis, elem):
+        count = 0
+        dic = Counter(lis)
+        if elem in dic:
+            count = dic[elem]
+        return count
 
     def simulateDiscard(self, hand, drawnTile: str): #Eventually will be filled with a method to select a discard, then return new hand and the discard tile
 
