@@ -349,52 +349,32 @@ class Player:
        
         return min(general_shanten(handArray), chiitoistu_shanten(handArray), orphanSource_shanten(handArray))
     
-
-
+    
     def calcTileEff(self, hand, discardPile):
         count = 0
         kinds = 0
 
-        sh1 = self.getShanten(hand)
+        initial_shanten = self.getShanten(hand)
 
-        if sh1 == -1:
+        if initial_shanten == -1:
             return (0, 0)
         
-        with open('tiles.json', 'r') as file:
+        with open('tiles_unique.json', 'r') as file:
             start_tiles = json.load(file)
 
-        tilePool = start_tiles
-
-        #tilePool represents all tiles that exist
-
-        for tile in self._game.dora: #remove dora tiles
-            tilePool[tile] -= 1
-
-        for tile in discardPile:
-            tilePool[tile] -= 1
-
-        for tile in hand: #remove tiles in hand
-            tilePool[tile] -= 1
-
-
-        for tile in tilePool:
+        for tile in start_tiles:
             handCopy = hand[:]
             discardPileCopy = discardPile[:]
             
             discardTile, sh2 = self.simulateDiscard(handCopy, tile)
 
-            if discardTile:
-                discardPileCopy.append(discardTile)
-                tilePool[discardTile] -= 1
-
-            if sh2 < sh1:
-                numTiles = tilePool[tile] 
-                count+=numTiles
-                kinds += 1
-            # elif sh1 == sh2:
-            #     return self.calcTileEff(handCopy, discardPileCopy)
+            if sh2 < initial_shanten:
+                numTiles = start_tiles[tile] 
+                count+= 4 #-dora-tiles in hand-tiles in discard pile
+                kinds+=1
 
         return count, kinds
+    
     
 
     def simulateDiscard(self, hand, drawnTile: str): #Eventually will be filled with a method to select a discard, then return new hand and the discard tile
@@ -418,6 +398,8 @@ class Player:
         discardPossibilities = []
         for i in range(len(hand)): 
 
+            if hand[i] == drawnTile: continue
+
             tempHand = hand[:i] + hand[i+1:]
 
             tempScore = self.getShanten(tempHand)
@@ -434,8 +416,5 @@ class Player:
         shanten  = discardPossibilities[0][1]
         hand.remove(discardTile)
         
-        # print("Post discard: ", discardTile)
-        # print(self.format_and_score_hand(hand))
-        # print()
 
         return (discardTile, shanten)
