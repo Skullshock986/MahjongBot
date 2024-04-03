@@ -1,6 +1,8 @@
 import tkinter as tk
-from tkinter import messagebox, ttk
+from tkinter import messagebox, ttk, PhotoImage
 from game import Game
+import json
+
 
 from player import Player
 
@@ -10,6 +12,10 @@ class MahjongGUI(tk.Tk):
         super().__init__()
         self.player = player
         self.title("Mahjong Game")
+        self.configure(background='black')
+
+        with open('tileImages.json', 'r') as file:
+            self.tileImages = json.load(file)  # Creates a dictionary containing an entire set of tiles
 
         # Initialize GUI components
         self.create_widgets()
@@ -43,6 +49,21 @@ class MahjongGUI(tk.Tk):
 
     def update_hand_display(self):
         # Update the displayed hand based on the player's current hand
+        labels = []
+        for i in self.player._hand:
+            image_path = self.tileImages.get(i) # Grab the path to the tile's image file based on whats in the hand
+            img = PhotoImage(file=image_path)
+            img = img.subsample(8, 8) # Shrink each icon so the screen isnt filled by TWO TILES LIKE TF
+
+            # Add the tile to an array of tiles to display
+            image_label = tk.Label(self, image=img)
+            labels.append(image_label)
+            image_label.image = img
+
+        # Add the tiles sequentially in a horizontal manner
+        for label in labels:
+            label.pack(side=tk.LEFT, padx=5)
+
         hand_str = ", ".join(self.player._hand)
         self.hand_label.config(text=hand_str)
 
@@ -68,7 +89,7 @@ class MahjongGUI(tk.Tk):
 if __name__ == "__main__":
     # Initialize the player
     game = Game()
-    player = Player(["2_char", "3_char", "5aka_char", "2_circ", "3_circ", "6_circ", "6_circ", "6_bamb", "7_bamb", "7_bamb", "w_drag", "w_drag", "w_drag"], "e", game)
+    player = Player(["2_char", "3_char", "5aka_char", "2_circ", "3_circ", "6_circ", "6_circ", "6_bamb", "7_bamb", "7_bamb", "r_drag", "r_drag", "r_drag"], "e", game)
 
     # Create and run the GUI
     app = MahjongGUI(player)
