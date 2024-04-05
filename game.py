@@ -58,15 +58,13 @@ class Game:
             self.turn+=1
             for player in self.players:
                 if not self.over:
-                    draw = self.drawTile()
-
-                    if not draw:
-                        self.over = True
-                        break
-                    
 
                     print(self.windDict[player.getSeat()] , "Player's turn, Turn: ", self.turn)
-                    discard = player.discard(draw)
+                    discard = player.discard()
+                    if discard == -1:
+                        self.over = True
+                        break
+
                     if not discard:
                         print(self.windDict[player.getSeat()], "Says: TSUMO!, on turn", self.turn)
                         hand = player.getHand()

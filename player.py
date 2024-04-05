@@ -51,20 +51,41 @@ class Player:
 
         return string
 
-    def discard(self, drawnTile: str): #Eventually will be filled with a method to select a discard, then return new hand and the discard tile
+
+    def draw(self):
+
+        drawnTile = self._game.drawTile()
+        if not drawnTile:
+            return -1
+        self._hand.append(drawnTile)  # append 14th tile to hand
+        formatHand = self.format_and_score_hand(self._hand)
+
+        print("Draw Tile: ", drawnTile)
+        print(formatHand["displayHand"], formatHand["shanten"])
+        print()
+
+        return drawnTile
+
+    def p_discard(self, discardTile):
+        self._hand.remove(discardTile)
+
+        print("Post discard: ", discardTile)
+        print(self.format_and_score_hand(self._hand))
+        print()
+
+        return (discardTile)
+
+    def discard(self): #Eventually will be filled with a method to select a discard, then return new hand and the discard tile
 
         print()
         print("Current Hand")
         print(self.format_and_score_hand(self._hand))
         print()
 
-        self._hand.append(drawnTile) #append 14th tile to hand
+        self.draw()
 
         formatHand = self.format_and_score_hand(self._hand)
 
-        print("Draw Tile: ", drawnTile)
-        print(formatHand["displayHand"], formatHand["shanten"])
-        print()
 
         if formatHand["shanten"] == -1:
             return None
